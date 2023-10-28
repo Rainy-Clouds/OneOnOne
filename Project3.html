@@ -2,23 +2,41 @@
 <html>
     <head>
         <title></title>
-        <style></style>
+        <link rel="stylesheet" href="style.css" />
         <script src="script.js"></script>
     </head>
     <body onload="initialize();">
-        <div>
-            <h1>Mario's Stats</h1>
-            <p id="strengthTag">Strength:</p>
-            <p id="speedTag">Speed:</p>
-            <p id="cunningTag">Cunning:</p>
-            <p id="fatigueTag">Fatigue:</p>
+        <h1 id="wintext"></h1>
+        <div class="fighterSec">
+            <div>
+                <h1>Mario's Stats</h1>
+                <p id="strengthTag">Strength:</p>
+                <p id="speedTag">Speed:</p>
+                <p id="cunningTag">Cunning:</p>
+                <p id="fatigueTag">Fatigue:</p>
+            </div>
+            <div class="log">
+                <h1>Move Log</h1>
+                <p id="playerLog"></p>
+            </div>
+        </div>
+        <div class="fighterSec">
+            <div>
+                <h1>Enemy's Stats</h1>
+                <p id="EstrengthTag">Strength:</p>
+                <p id="EspeedTag">Speed:</p>
+                <p id="EcunningTag">Cunning:</p>
+                <p id="EfatigueTag">Fatigue:</p>
+            </div>
+            <div class="log">
+                <h1>Move Log</h1>
+                <p id="enemyLog"></p>
+            </div>
         </div>
         <div>
-            <h1>Enemy's Stats</h1>
-            <p id="EstrengthTag">Strength:</p>
-            <p id="EspeedTag">Speed:</p>
-            <p id="EcunningTag">Cunning:</p>
-            <p id="EfatigueTag">Fatigue:</p>
+            <button id="attackButton" onclick="playTurn('Attack');">Attack</button>
+            <button id="defendButton" onclick="playTurn('Defend');">Defend</button>
+            <button id="finishingMoveButton" onclick="playTurn('Finishing Move');" disabled>Finishing Move</button>
         </div>
     </body>
 </html>

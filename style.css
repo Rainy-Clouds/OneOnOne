@@ -1,0 +1,14 @@
+.fighterSec
+{
+    display: flex;
+    justify-content: space-around;
+    height: 35vh;
+}
+
+.log
+{
+
+    height: 100%;
+    background-color: rgb(225, 225, 225);
+    overflow-y: auto;
+}
