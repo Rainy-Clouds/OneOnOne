@@ -1,14 +1,53 @@
+.gametab
+{
+    display: flex;
+    width: 80vw;
+    height: 80vh;
+    background-color: rgb(237, 237, 237);
+    border-radius: 25px;
+    justify-content: space-between;
+}
+
 .fighterSec
 {
     display: flex;
+    flex-direction: column;
     justify-content: space-around;
-    height: 35vh;
+    width: 15%;
 }
 
 .log
 {
-
     height: 100%;
     background-color: rgb(225, 225, 225);
     overflow-y: auto;
+}
+
+.gamecenter
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.gamecanvas
+{
+    border: 1px solid black;
+    max-width: 90%;
+    max-height: 75%;
+}
+
+.center
+{
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+}
+
+.loader
+{
+    display: none;
 }
