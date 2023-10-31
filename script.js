@@ -1,17 +1,17 @@
-// Strength, Speed, Cunning, Fatigue
-const playerStats = [6, 6, 6, 30];
-const enemyStats = [6, 6, 6, 30];
+// Strength, Speed, Cunning, Fatigue, Starting Fatigue, Current Move, Animation object
+const playerStats = [6, 6, 6, 30, 30, "", null];
+const enemyStats = [6, 6, 6, 30, 30, "", null];
 const options = ["Attack", "Defend"];
-let playerStartFatigue, enemyStartFatigue, turnInProgress, playerWent, playerAtk;
+const deadPlayers = [];
+let winningPlayer;
+let turnInProgress, gameInProgress;
 let canvas, canvasAnim, context;
 let frame = 0;
 
-let enemyAttack = "";
-
 function initialize()
 {
-    startFight();
     setUpCanvas();
+    startFight();
 
     update();
 }
@@ -28,30 +28,9 @@ function update()
     EcunningTag.innerHTML = `Cunning: ${enemyStats[2]}`;
     EfatigueTag.innerHTML = `Fatigue: ${enemyStats[3]}`;
 
-    attackButton.disabled = turnInProgress;
-    defendButton.disabled = turnInProgress;
-    finishingMoveButton.disabled = !(playerStats[3] >= enemyStats[3] * 2 || enemyStats[3] < 0) || turnInProgress;
-
-    if(turnInProgress && !playerWent && !canvasAnim.mario.attacking)
-    {
-        playerWent = true;
-
-        if(enemyAttack === "Attack")
-        {
-            canvasAnim.koopa.attack();
-            attackMethod(enemyStats, playerAtk, playerStats, playerStartFatigue, false, "Enemy");
-            enemyLog.innerHTML += "Attacked </br>";
-        }
-        if(enemyAttack === "Finishing Move")
-        {
-            attackMethod(enemyStats, playerAtk, playerStats, playerStartFatigue, true, "Enemy");
-            enemyLog.innerHTML += "Did a Finishing Move </br>";
-        }
-    }
-    if(turnInProgress && playerWent && !canvasAnim.koopa.attacking && !canvasAnim.mario.defending)
-    {
-        turnInProgress = false;
-    }
+    attackButton.disabled = turnInProgress || !gameInProgress;
+    defendButton.disabled = turnInProgress || !gameInProgress;
+    finishingMoveButton.disabled = !(playerStats[3] >= enemyStats[3] * 2 || enemyStats[3] < 0) || turnInProgress || !gameInProgress;
 }
 
 function startFight()
@@ -59,11 +38,8 @@ function startFight()
     setPlayer(playerStats);
     setPlayer(enemyStats);
 
-    playerStartFatigue = playerStats[3];
-    enemyStartFatigue = enemyStats[3];
-
     turnInProgress = false;
-    playerWent = false;
+    gameInProgress = true;
 }
 
 function setPlayer(playerArray)
@@ -92,45 +68,53 @@ function setPlayer(playerArray)
             playerArray[i] += getRandInt(-multiplier, 0); 
         }
     }
+
+    playerArray[4] = playerArray[3];
 }
 
 function playTurn(playerAttack)
 {
     turnInProgress = true;
-    playerWent = false;
-    playerAtk = playerAttack;
+    playerStats[5] = playerAttack;
 
     if((enemyStats[3] >= playerStats[3] * 2 || playerStats[3] < 0))
     {
-        enemyAttack = "Finishing Move"
+        enemyStats[5] = "Finishing Move"
     }
     else
     {
-        enemyAttack = options[getRandInt(0, options.length - 1)];
+        enemyStats[5] = options[getRandInt(0, options.length - 1)];
     }
 
     if(playerAttack === "Attack")
     {
-        canvasAnim.mario.attack();
-        attackMethod(playerStats, enemyAttack, enemyStats, enemyStartFatigue, false, "Mario");
+        playerStats[6].attack();
+    
         playerLog.innerHTML += "Attacked </br>";
-    }
-    if(playerAttack === "Defend" && enemyAttack === "Defend")
-    {
-        canvasAnim.mario.defend(true);
-        canvasAnim.koopa.defend(true);
     }
     if(playerAttack === "Finishing Move")
     {
-        attackMethod(playerStats, enemyAttack, enemyStats, enemyStartFatigue, true, "Mario");
+        canvasAnim.dfx.fadeIn = true;
+        playerStats[6].finishingMove();
+
         playerLog.innerHTML += "Did a Finishing Move </br>";
+    }
+
+    if(playerAttack === "Defend" && enemyStats[5] === "Defend")
+    {
+        playerStats[6].defend(true);
+        enemyStats[6].defend(true);
+    }
+    else if(playerAttack === "Defend")
+    {
+        halfTurn();
     }
 
     if(playerAttack === "Defend")
     {
         playerLog.innerHTML += "Defended </br>"
     }
-    if(enemyAttack === "Defend")
+    if(enemyStats[5] === "Defend")
     {
         enemyLog.innerHTML += "Defended </br>"
     }
@@ -138,23 +122,61 @@ function playTurn(playerAttack)
     update();
 }
 
-function attackMethod(stats, oppAttack, oppStats, oppStartFatigue, finishing, name)
+function halfTurn()
+{
+    canvasAnim.dfx.fadeIn = false;
+
+    if(!(!(enemyStats[5] === "Finishing Move") && deadPlayers[0] == enemyStats[6]))
+    {
+        if(enemyStats[5] === "Attack")
+        {
+            enemyStats[6].attack();
+
+            enemyLog.innerHTML += "Attacked </br>";
+        }
+        if(enemyStats[5] === "Finishing Move")
+        {
+            canvasAnim.dfx.fadeIn = true;
+            enemyStats[6].finishingMove();
+            
+            enemyLog.innerHTML += "Did a Finishing Move </br>";
+        }
+        if(enemyStats[5] === "Defend")
+        {
+            turnInProgress = false;
+        }
+    }
+    else
+    {
+        finishTurn();
+    }
+}
+
+function finishTurn()
+{
+    turnInProgress = false;
+    canvasAnim.dfx.fadeIn = false;
+
+    announceWinner();
+}
+
+function attackMethod(stats, oppStats, finishing)
 {
     let diff = 0;
     if(finishing)
     {
-        if(oppAttack === "Defend")
+        if(oppStats[5] === "Defend")
         {
             diff = ((stats[0] + stats[1]) / getRandInt(1, 3)) - (oppStats[1] + oppStats[2]);
         }
         else
         {
-            diff = ((stats[0] + stats[1]) / getRandInt(1, 3)) - (oppStats[1] + getRandInt(1, 6));
+            diff = 10;//((stats[0] + stats[1]) / getRandInt(1, 3)) - (oppStats[1] + getRandInt(1, 6));
         }
     }
     else
     {
-        if(oppAttack === "Defend")
+        if(oppStats[5] === "Defend")
         {
             diff = ((stats[0] + stats[1] + stats[2]) / getRandInt(1, 3)) - (oppStats[1] + oppStats[2]);
         }
@@ -164,26 +186,53 @@ function attackMethod(stats, oppAttack, oppStats, oppStartFatigue, finishing, na
         }
     }
     
-
     console.log(diff);
     if(diff > 0)
     {
         if(finishing)
         {
-            wintext.innerHTML = `${name} wins!`;
+            deadPlayers.push(oppStats[6]);
+            winningPlayer = stats[6];
         }
         else
         {
             oppStats[3] -= diff;
         }
     }
-    else if(oppAttack === "Defend")
+    else if(oppStats[5] === "Defend")
     {
         oppStats[3] += getRandInt(1, 6);
-        if(oppStats[3] > oppStartFatigue)
+        if(oppStats[3] > oppStats[4])
         {
-            oppStats[3] = oppStartFatigue;
+            oppStats[3] = oppStats[4];
         }
+    }
+}
+
+function announceWinner()
+{
+    if(deadPlayers.length == 1)
+    {
+        deadPlayers[0].startingframe = frame;
+        deadPlayers[0].state = "dead";
+        winningPlayer.state = "win";
+    
+        wintext.innerHTML = `${winningPlayer.name} wins!`;
+        gameInProgress = false;
+    }
+    else if(deadPlayers.length == 2)
+    {
+        deadPlayers[0].state = "dead";
+        deadPlayers[0].startingframe = frame;
+        deadPlayers[1].state = "dead";
+        deadPlayers[1].startingframe = frame;
+
+        wintext.innerHTML = "Nobody Wins?!";
+        gameInProgress = false;
+    }
+    else
+    {
+        console.log("Extra dead players?");
     }
 }
 
@@ -192,7 +241,7 @@ function getRandInt(min, max)
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-// Everything beneath this comment works with the Canvas and animations
+// ========================== Everything beneath this comment works with the Canvas and animations ==============================
 
 class CanvasAnimations
 {
@@ -201,6 +250,8 @@ class CanvasAnimations
         console.log("test");
         this.mario = new Mario(0, 350);
         this.koopa = new Koopa(500, 350);
+        this.dfx = new DarkFX(0.3);
+        this.background = document.getElementById("bg");
     }
     update()
     {
@@ -208,9 +259,13 @@ class CanvasAnimations
 
         this.mario.update();
         this.koopa.update();
+        this.dfx.update();
     }
     render(ctx)
     {
+        ctx.drawImage(this.background, 0, 0);
+
+        this.dfx.render(ctx);
         this.koopa.render(ctx);
         this.mario.render(ctx);
     }
@@ -226,10 +281,12 @@ class Mario
         this.startingframe = 0;
         this.image = document.getElementById("marioimages");
         this.state = "idle";
-        this.attacking = false;
         this.defending = false;
         this.hurt = false;
         this.staticdefend = false;
+        this.finishing = false;
+        this.name = "Mario";
+        this.called = false;
     }
     update()
     {
@@ -260,9 +317,9 @@ class Mario
             if(frame - this.startingframe < 13)
             {
                 this.frame = 2;
-                if(!canvasAnim.koopa.defending && enemyAttack === "Defend")
+                if(!enemyStats[6].defending && enemyStats[5] === "Defend")
                 {
-                    canvasAnim.koopa.defend();
+                    enemyStats[6].defend();
                 }
             }
             else if(frame - this.startingframe < 16)
@@ -272,9 +329,14 @@ class Mario
             else if(frame - this.startingframe < 30)
             {
                 this.frame = 4;
-                if(!canvasAnim.koopa.hurt && !(enemyAttack === "Defend"))
+                if(!enemyStats[6].hurt && !(enemyStats[5] === "Defend"))
                 {
-                    canvasAnim.koopa.getHurt();
+                    enemyStats[6].getHurt();
+                }
+                if(!this.called)
+                {
+                    attackMethod(playerStats, enemyStats, this.finishing);
+                    this.called = true;
                 }
             }
             else
@@ -298,7 +360,8 @@ class Mario
             {
                 this.x = 0;
                 this.state = "idle";
-                this.attacking = false;
+                this.finishing = false;
+                halfTurn();
             }
         }
         if(this.state === "defend")
@@ -318,6 +381,11 @@ class Mario
             {
                 this.state = "idle";
                 this.defending = false;
+
+                if(this.staticdefend)
+                {
+                    finishTurn();
+                }
             }
         }
         if(this.state === "hurt")
@@ -339,11 +407,26 @@ class Mario
                 this.hurt = false;
             }
         }
+        if(this.state === "dead")
+        {
+            if(frame - this.startingframe < 10)
+            {
+                this.frame = 6;
+            }
+            else
+            {
+                this.frame = 7;
+            }
+        }
+        if(this.state === "win")
+        {
+            this.frame = 5;
+        }
     }
     attack()
     {
         this.state = "runTo";
-        this.attacking = true;
+        this.called = false;
     }
     defend(stat)
     {
@@ -357,9 +440,21 @@ class Mario
         this.state = "hurt";
         this.startingframe = frame;
     }
+    finishingMove()
+    {
+        this.state = "runTo";
+        this.finishing = true;
+        this.called = false;
+    }
     render(ctx)
     {
+        if(this.finishing)
+        {
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "yellow";
+        }
         ctx.drawImage(this.image, 0, 128 * this.frame, 196, 128, this.x, this.y, 294, 192);
+        ctx.shadowBlur = 0;
     }
 }
 
@@ -373,10 +468,11 @@ class Koopa
         this.state = "idle";
         this.startingframe = 0;
         this.image = document.getElementById("koopaimages");
-        this.attacking = false;
         this.defending = false;
         this.hurt = false;
         this.staticdefend = false;
+        this.finishing = false;
+        this.name = "Koopa";
     }
     update()
     {
@@ -403,17 +499,18 @@ class Koopa
         {
             this.frame = 2;
             this.x -= 25;
-            if(this.x <= 200 && playerAtk === "Defend" && !canvasAnim.mario.defending)
+            if(this.x <= 200 && playerStats[5] === "Defend" && !playerStats[6].defending)
             {
-                canvasAnim.mario.defend();
+                playerStats[6].defend();
             }
-            if(this.x <= 150 && !(playerAtk === "Defend") && !canvasAnim.mario.hurt)
+            if(this.x <= 150 && !(playerStats[5] === "Defend") && !playerStats[6].hurt)
             {
-                canvasAnim.mario.getHurt();
+                playerStats[6].getHurt();
             }
             if(this.x <= 45)
             {
                 this.state = "return";
+                attackMethod(enemyStats, playerStats, this.finishing);
             }
         }
         if(this.state === "return")
@@ -424,7 +521,8 @@ class Koopa
             {
                 this.x = 500;
                 this.state = "idle";
-                this.attacking = false;
+                this.finishing = false;
+                finishTurn();
             }
         }
         if(this.state === "defend")
@@ -476,12 +574,33 @@ class Koopa
                 this.hurt = false;
             }
         }
+        if(this.state === "win")
+        {
+            this.frame = 3;
+        }
+        if(this.state === "dead")
+        {
+            if(frame - this.startingframe < 5)
+            {
+                this.frame = 4;
+            }
+            else
+            {
+                if(frame % 30 < 15)
+                {
+                    this.frame = 5;
+                }
+                else
+                {
+                    this.frame = 7;
+                }
+            }
+        }
     }
     attack()
     {
         this.state = "enterShell"
         this.startingframe = frame;
-        this.attacking = true;
     }
     defend(stat)
     {
@@ -495,9 +614,57 @@ class Koopa
         this.state = "hurt";
         this.startingframe = frame;
     }
+    finishingMove()
+    {
+        this.state = "enterShell";
+        this.startingframe = frame;
+        this.finishing = true;
+    }
     render(ctx)
     {
+        if(this.finishing)
+        {
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "yellow";
+        }
         ctx.drawImage(this.image, 0, 128 * this.frame, 196, 128, this.x, this.y, 294, 192);
+        ctx.shadowBlur = 0;
+    }
+}
+
+class DarkFX
+{
+    constructor(maxShade)
+    {
+        this.shade = 0;
+        this.max = maxShade;
+        this.fadeIn = false;
+    }
+    update()
+    {
+        if(this.fadeIn)
+        {
+            this.shade += 0.025;
+            if(this.shade >= this.max)
+            {
+                this.shade = this.max;
+            }
+        }
+        else
+        {
+            this.shade -= 0.025;
+            if(this.shade <= 0)
+            {
+                this.shade = 0;
+            }
+        }
+    }
+    render(ctx)
+    {
+        ctx.globalAlpha = this.shade;
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, 800, 600);
+        ctx.globalAlpha = 1.0;
     }
 }
 
@@ -509,6 +676,9 @@ function setUpCanvas()
 
     context = canvas.getContext('2d');
     canvasAnim = new CanvasAnimations();
+
+    playerStats[6] = canvasAnim.mario;
+    enemyStats[6] = canvasAnim.koopa;
 
     animate();
 }
