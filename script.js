@@ -119,6 +119,26 @@ function playTurn(playerAttack)
         enemyLog.innerHTML += "Defended </br>"
     }
 
+    if(playerAttack === "Defend" && enemyStats[5] === "Defend")
+    {
+        let pHeal = getRandInt(1, 6);
+        let eHeal = getRandInt(1, 6);
+
+        playerStats[3] += pHeal;
+        if(playerStats[3] > playerStats[4])
+        {
+            playerStats[3] = playerStats[4];
+        }
+        canvasAnim.addMarker(playerStats[6].centerx + getRandInt(-40, 40), playerStats[6].y, pHeal);
+
+        enemyStats[3] += eHeal;
+        if(enemyStats[3] > enemyStats[4])
+        {
+            enemyStats[3] = enemyStats[4];
+        }
+        canvasAnim.addMarker(enemyStats[6].centerx + getRandInt(-40, 40), enemyStats[6].y, eHeal);
+    }
+
     update();
 }
 
@@ -171,7 +191,7 @@ function attackMethod(stats, oppStats, finishing)
         }
         else
         {
-            diff = 10;//((stats[0] + stats[1]) / getRandInt(1, 3)) - (oppStats[1] + getRandInt(1, 6));
+            diff = ((stats[0] + stats[1]) / getRandInt(1, 3)) - (oppStats[1] + getRandInt(1, 6));
         }
     }
     else
@@ -185,6 +205,8 @@ function attackMethod(stats, oppStats, finishing)
             diff = ((stats[0] + stats[1] + stats[2]) / getRandInt(1, 3)) - (oppStats[1] + getRandInt(1, 6));
         }
     }
+
+    diff = Math.round(diff);
     
     console.log(diff);
     if(diff > 0)
@@ -198,14 +220,22 @@ function attackMethod(stats, oppStats, finishing)
         {
             oppStats[3] -= diff;
         }
+
+        canvasAnim.addMarker(oppStats[6].centerx + getRandInt(-40, 40), oppStats[6].y, -diff);
     }
     else if(oppStats[5] === "Defend")
     {
-        oppStats[3] += getRandInt(1, 6);
+        let heal = getRandInt(1, 6)
+        oppStats[3] += heal;
         if(oppStats[3] > oppStats[4])
         {
             oppStats[3] = oppStats[4];
         }
+        canvasAnim.addMarker(oppStats[6].centerx + getRandInt(-40, 40), oppStats[6].y, heal);
+    }
+    else
+    {
+        canvasAnim.addMarker(oppStats[6].centerx + getRandInt(-40, 40), oppStats[6].y, 0);
     }
 }
 
@@ -230,10 +260,6 @@ function announceWinner()
         wintext.innerHTML = "Nobody Wins?!";
         gameInProgress = false;
     }
-    else
-    {
-        console.log("Extra dead players?");
-    }
 }
 
 function getRandInt(min, max)
@@ -252,6 +278,16 @@ class CanvasAnimations
         this.koopa = new Koopa(500, 350);
         this.dfx = new DarkFX(0.3);
         this.background = document.getElementById("bg");
+
+        this.markers = [];
+    }
+    deleteMarker(marker)
+    {
+        this.markers.splice(this.markers.indexOf(marker), 1);
+    }
+    addMarker(x, y, v)
+    {
+        this.markers.push(new Marker(x, y, v));
     }
     update()
     {
@@ -260,6 +296,11 @@ class CanvasAnimations
         this.mario.update();
         this.koopa.update();
         this.dfx.update();
+
+        for(let i = 0; i < this.markers.length; i++)
+        {
+            this.markers[i].update();
+        }
     }
     render(ctx)
     {
@@ -268,6 +309,11 @@ class CanvasAnimations
         this.dfx.render(ctx);
         this.koopa.render(ctx);
         this.mario.render(ctx);
+
+        for(let i = 0; i < this.markers.length; i++)
+        {
+            this.markers[i].render(ctx);
+        }
     }
 }
 
@@ -276,6 +322,7 @@ class Mario
     constructor(x, y)
     {
         this.x = x;
+        this.centerx = x + 120;
         this.y = y;
         this.frame = 0;
         this.startingframe = 0;
@@ -463,6 +510,7 @@ class Koopa
     constructor(x, y)
     {
         this.x = x;
+        this.centerx = x + 120;
         this.y = y;
         this.frame = 0;
         this.state = "idle";
@@ -665,6 +713,65 @@ class DarkFX
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, 800, 600);
         ctx.globalAlpha = 1.0;
+    }
+}
+
+class Marker
+{
+    constructor(x, y, val)
+    {
+        this.x = x;
+        this.y = y;
+        if(val == 0)
+        {
+            this.val = 0;
+            this.image = document.getElementById("neutmarker");
+        }
+        else if(val > 0)
+        {
+            this.val = `+${val}`;
+            this.image = document.getElementById("healmarker");
+        }
+        else
+        {
+            this.val = val;
+            this.image = document.getElementById("hitmarker");
+        }
+        this.fade = 0.1;
+        this.fadeout = false;
+        this.initframe = frame;
+    }
+    update()
+    {
+        this.y -= 2;
+        if(this.fadeout)
+        {
+            this.fade -= 0.05;
+            if(this.fade <= 0)
+            {
+                this.fade = 0;
+                canvasAnim.deleteMarker(this);
+            }
+        }
+        else
+        {
+            this.fade += 0.1;
+            if(frame - this.initframe > 15)
+            {
+                this.fadeout = true;
+            }
+        }
+    }
+    render(ctx)
+    {
+        ctx.globalAlpha = this.fade;
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+
+        ctx.drawImage(this.image, this.x, this.y, 75, 75);
+        ctx.fillText(this.val, this.x + 35, this.y + 47);
+        ctx.globalAlpha = 1;
     }
 }
 
