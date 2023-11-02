@@ -6,44 +6,70 @@
         <script src="script.js"></script>
     </head>
     <body onload="initialize();">
+        <img class="bg" src="assets/background.jpg" />
+
         <section class="gametab center">
             <section class="fightersection">
-                <div class="statsholder">
-                    <h1 class="statstitle">Mario's Stats</h1>
-                    <p id="strengthTag">Strength:</p>
-                    <p id="speedTag">Speed:</p>
-                    <p id="cunningTag">Cunning:</p>
-                    <p id="fatigueTag">Fatigue:</p>
+                <div  style="border-radius: 22px 0 0 0;" class="statstitle">
+                    <h1 style="color: rgb(232, 0, 0)">Mario</h1>
                 </div>
-                <div class="logholder">
+                <div class="statsholder">
+                    <p id="fatigueTag" class="fatigue">Fatigue:</p>
+                    <div class="ministat">
+                        <img class="staticon" src="assets/strength.png" />
+                        <p id="strengthTag" class="stat">Strength:</p>
+                    </div>
+                    <div class="ministat">
+                        <img class="staticon" src="assets/speed.png" />
+                        <p id="speedTag" class="stat">Speed:</p>
+                    </div>
+                    <div class="ministat">
+                        <img class="staticon" src="assets/cunning.png" />
+                        <p id="cunningTag" class="stat">Cunning:</p>
+                    </div>
+                </div>
+                <div style="border-radius: 0 0 0 22px;" class="logholder">
+                    <h1 class="logtitle">Move Log</h1>
                     <div class="log">
-                        <h1 class="logtitle">Move Log</h1>
                         <p id="playerLog" class="innerlog"></p>
                     </div>  
                 </div>
             </section>
 
             <section class="gamecenter">
-                <h1 id="wintext">Paper Mario Fight!</h1>
-                <canvas class="gamecanvas"></canvas>
-                <div>
-                    <button id="attackButton" onclick="playTurn('Attack');">Attack</button>
-                    <button id="defendButton" onclick="playTurn('Defend');">Defend</button>
-                    <button id="finishingMoveButton" onclick="playTurn('Finishing Move');" disabled>Finishing Move</button>
+                <div class="header">
+                    <h1 id="wintext">Paper Mario Fight!</h1>
+                    <canvas class="gamecanvas"></canvas>
+                </div>
+                <div class="footer">
+                    <button id="attackButton" class="menubutton small attackbtn" onclick="playTurn('Attack');">Attack</button>
+                    <button id="defendButton" class="menubutton small defendbtn" onclick="playTurn('Defend');">Defend</button>
+                    <button id="finishingMoveButton" class="menubutton big fmbtn" onclick="playTurn('Finishing Move');" disabled>Finishing Move</button>
                 </div>
             </section>
 
             <section class="fightersection">
-                <div class="statsholder">
-                    <h1 class="statstitle">Koopa's Stats</h1>
-                    <p id="EstrengthTag">Strength:</p>
-                    <p id="EspeedTag">Speed:</p>
-                    <p id="EcunningTag">Cunning:</p>
-                    <p id="EfatigueTag">Fatigue:</p>
+                <div style="border-radius: 0 22px 0 0;" class="statstitle">
+                    <h1 style="color: rgb(3, 155, 0)">Koopa</h1>
                 </div>
-                <div class="logholder">
+                <div class="statsholder">
+                    <p id="EfatigueTag" class="fatigue">Fatigue:</p>
+                    <div class="ministat">
+                        <img class="staticon" src="assets/strength.png" />
+                        <p id="EstrengthTag" class="stat">Strength:</p>
+                    </div>
+                    <div class="ministat">
+                        <img class="staticon" src="assets/speed.png" />
+                        <p id="EspeedTag" class="stat">Speed:</p>
+                    </div>
+                    <div class="ministat">
+                        <img class="staticon" src="assets/cunning.png" />
+                        <p id="EcunningTag" class="stat">Cunning:</p>
+                    </div>
+                </div>
+                <div  style="border-radius: 0 0 22px 0;" class="logholder">
+                    <h1 class="logtitle">Move Log</h1>
                     <div class="log">
-                        <h1 class="logtitle">Move Log</h1>
                         <p id="enemyLog" class="innerlog"></p>
                     </div>
                 </div>

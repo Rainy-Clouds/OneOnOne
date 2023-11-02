@@ -1,6 +1,25 @@
 * {
     margin: 0;
     padding: 0;
+    font-family: heyGorgeous;
+}
+
+@font-face {
+    font-family: heyGorgeous;
+    src: url(assets/heygorgeous.ttf);
+}
+
+.bg {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	min-width: 110%;
+	min-height: 110%;
+	filter: blur(3px);
+	
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
 }
 
 .gametab
@@ -8,9 +27,11 @@
     display: flex;
     width: 80vw;
     height: 80vh;
-    background-color: rgb(237, 237, 237);
     border-radius: 25px;
     justify-content: space-between;
+    background-image: url("assets/paper.jpg");
+    box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.5);
+    border: solid 5px #b3ac78;
 }
 
 #wintext
@@ -27,62 +48,187 @@
     width: 20%;
 }
 
+.statstitle
+{
+    width: 100%;
+    font-size: 20pt;
+    height: 15%;
+    text-shadow: rgba(0, 0, 0, 0.79) 3px 3px 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ebe4abdd;
+}
+
 .statsholder
 {
-    height: 40%;
+    width: 100%;
+    height: 30%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+    background-color: #ebe4abdd;
 }
 
-.statstitle
+.fatigue
 {
-    font-size: 24pt;
-    padding: 15px;
+    font-size: 12pt;
+    padding-bottom: 15px;
 }
 
-.statsholder p
+.ministat
 {
-    padding-bottom: 10px;
-    padding-left: 20px;
+    max-width: 100%;
+    min-width: 60%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat
+{
+    padding-bottom: 5px;
+    padding-top: 5px;
+    font-size: 8pt;
+}
+
+.staticon
+{
+    width: 25px;
+    height: 25px;
 }
 
 .logholder
 {
     width: 100%;
-    height: 60%;
+    height: 55%;
     display: flex;
-    justify-content: center;
     align-items: center;
+    background-color: #d5cc80bf;
+    flex-direction: column;
 }
 
 .log
 {
-    margin: 10px;
-    background-color: rgb(225, 225, 225);
-    /* overflow-y: auto; */
     width: 75%;
-    height: 85%;
-    flex-direction: flex;
+    max-height: 75%; 
+    font-size: 8pt;
+    overflow-y: auto;
 }
 
 .logtitle
 {
-    
+    padding: 15px;
+    padding-top: 20px;
 }
 
 .gamecenter
 {
+    width: 60%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: #f1ecc7c0;
+    justify-content: space-around;
+    /* z-index: 2;
+    box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.5); */
+}
+
+.header
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 80%;
 }
 
 .gamecanvas
 {
     border: 1px solid black;
     max-width: 90%;
-    max-height: 75%;
+    max-height: 85%;
+}
+
+.footer
+{
+    height: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 85%;
+}
+
+.menubutton
+{
+    height: 65%;
+    border-radius: 5px;
+    color: white;
+    transition-duration: 0.25s;
+}
+
+.small
+{
+    width: 20%;
+}
+
+.big
+{
+    width: 30%;
+}
+
+.attackbtn
+{
+    background-color: rgb(255, 131, 82);
+    border-color: rgb(192, 78, 33);
+}
+
+.attackbtn:hover
+{
+    background-color: rgb(233, 117, 71);
+}
+
+.attackbtn:active
+{
+    background-color: rgb(206, 94, 49);
+}
+
+.defendbtn
+{
+    background-color: rgb(82, 151, 255);
+    border-color: rgb(24, 79, 160);
+}
+
+.defendbtn:hover
+{
+    background-color: rgb(62, 131, 235);
+}
+
+.defendbtn:active
+{
+    background-color: rgb(30, 94, 190);
+}
+
+
+.fmbtn
+{
+    background-color: rgb(244, 231, 49);
+    border-color: rgb(193, 181, 20);
+}
+
+.fmbtn:hover
+{
+    background-color: rgb(213, 201, 30);
+}
+
+.fmbtn:active
+{
+    background-color: rgb(170, 160, 12);
+}
+
+.menubutton:disabled
+{
+    opacity: 40%;
 }
 
 .center
