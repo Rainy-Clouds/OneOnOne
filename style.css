@@ -51,7 +51,7 @@
 .statstitle
 {
     width: 100%;
-    font-size: 20pt;
+    font-size: 1.9vw;
     height: 15%;
     text-shadow: rgba(0, 0, 0, 0.79) 3px 3px 5px;
     display: flex;
@@ -73,7 +73,7 @@
 
 .fatigue
 {
-    font-size: 12pt;
+    font-size: 1.15vw;
     padding-bottom: 15px;
 }
 
@@ -89,13 +89,13 @@
 {
     padding-bottom: 5px;
     padding-top: 5px;
-    font-size: 8pt;
+    font-size: 0.75vw;
 }
 
 .staticon
 {
-    width: 25px;
-    height: 25px;
+    width: 1.5vw;
+    height: 1.5vw;
 }
 
 .logholder
@@ -112,7 +112,7 @@
 {
     width: 75%;
     max-height: 75%; 
-    font-size: 8pt;
+    font-size: 0.75vw;
     overflow-y: auto;
 }
 
@@ -120,6 +120,7 @@
 {
     padding: 15px;
     padding-top: 20px;
+    font-size: 1.15vw;
 }
 
 .gamecenter
