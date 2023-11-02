@@ -40,6 +40,10 @@ function startFight()
 
     turnInProgress = false;
     gameInProgress = true;
+
+    document.getElementById("attackButton").addEventListener("click", function(){playTurn("Attack");});
+    document.getElementById("defendButton").addEventListener("click", function(){playTurn("Defend");});
+    document.getElementById("finishingMoveButton").addEventListener("click", function(){playTurn("Finishing Move");});
 }
 
 function setPlayer(playerArray)
@@ -262,8 +266,7 @@ function announceWinner()
     }
 }
 
-function getRandInt(min, max)
-{
+const getRandInt = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
@@ -722,21 +725,10 @@ class Marker
     {
         this.x = x;
         this.y = y;
-        if(val == 0)
-        {
-            this.val = 0;
-            this.image = document.getElementById("neutmarker");
-        }
-        else if(val > 0)
-        {
-            this.val = `+${val}`;
-            this.image = document.getElementById("healmarker");
-        }
-        else
-        {
-            this.val = val;
-            this.image = document.getElementById("hitmarker");
-        }
+
+        this.val = val == 0 ? 0 : val > 0 ? `+${val}` : val;
+        this.image = val == 0 ? neutmarker : val > 0 ? healmarker : hitmarker;
+
         this.fade = 0.1;
         this.fadeout = false;
         this.initframe = frame;
